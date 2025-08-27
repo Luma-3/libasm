@@ -2,7 +2,9 @@ NASM = nasm
 GCC = gcc
 
 SRCS_DIR = src/
-SRCS = strlen.s
+SRCS =	ft_strlen.s \
+				ft_strcpy.s \
+				ft_strcmp.s 
 SRCS_TESTER = tester.c
 
 OBJ_DIR = obj/
