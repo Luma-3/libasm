@@ -1,11 +1,12 @@
 NASM = nasm
-GCC = gcc
+GCC = g++
 
 SRCS_DIR = src/
 SRCS =	ft_strlen.s \
 				ft_strcpy.s \
-				ft_strcmp.s 
-SRCS_TESTER = tester.c
+				ft_strcmp.s \
+				ft_write.s
+SRCS_TESTER = tester.cpp
 
 OBJ_DIR = obj/
 OBJ = $(SRCS:%.s=$(OBJ_DIR)%.o)
@@ -13,8 +14,8 @@ OBJ = $(SRCS:%.s=$(OBJ_DIR)%.o)
 NAME = libasm.a
 NAME_TEST = tester
 
-CFLAGS = -Wall -Wextra -Werror -g3
-NASMFLAGS = -f elf64
+CFLAGS = -Wall -Wextra -Werror -g3 -fPIC -fPIE -pie
+NASMFLAGS = -f elf64 -DPIC
 
 all: $(NAME)
 

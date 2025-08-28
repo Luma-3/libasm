@@ -17,7 +17,8 @@ xor rax, rax
   jmp .loop
 
 .end:
-  sub al, bl
   movzx rax, al
+  movzx rbx, bl
+  sub rax, rbx
   ret
 
