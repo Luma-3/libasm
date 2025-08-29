@@ -17,8 +17,8 @@ OBJ = $(SRCS:%.s=$(OBJ_DIR)%.o)
 NAME = libasm.a
 NAME_TEST = tester
 
-CFLAGS = -Wall -Wextra -Werror -g3 -fPIC -fPIE -no-pie
-NASMFLAGS = -f elf64 -DPIC
+CFLAGS = -Wall -Wextra -Werror -g3 -fPIC -fPIE
+NASMFLAGS = -f elf64 -DPIC -g -F dwarf -w+all
 
 all: $(NAME)
 

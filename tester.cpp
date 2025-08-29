@@ -404,7 +404,7 @@ int main() {
 
   test_strdup(10000);
 
-  std::cout << ft_atoi_base("1", "0123456789") << '\n';
+  std::cout << ft_atoi_base("A2", "0123456789ABCDEF") << '\n';
 
   return 0;
 }

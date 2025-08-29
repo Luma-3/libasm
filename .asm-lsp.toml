@@ -1,0 +1,15 @@
+
+[default_config]
+assembler = "nasm"
+instruction_set = "x86-64"
+
+[default_config.opts]
+instruction_set = "x86-64"
+assembler = "nasm"
+compiler = "nasm"
+compile_flags_txt = []
+diagnostics = true
+default_diagnostics = true
+default_bits = 64
+default_format = "elf64"
+
