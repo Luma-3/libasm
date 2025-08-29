@@ -2,7 +2,6 @@ global ft_strlen
 
 section .text
   ft_strlen:
-    mov rax, rdi ; use directly rax for the result
     mov rcx, -1 ; set rcx to -1 (0xffffffffffffffff) for repnz scasb (infinite count)
     xor al, al ; set al to 0 (null terminator)
     repnz scasb ; scan for null terminator, rcx will be decremented

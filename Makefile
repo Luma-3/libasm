@@ -5,7 +5,10 @@ SRCS_DIR = src/
 SRCS =	ft_strlen.s \
 				ft_strcpy.s \
 				ft_strcmp.s \
-				ft_write.s
+				ft_write.s	\
+				ft_read.s		\
+				ft_strdup.s \
+				ft_atoi_base.s
 SRCS_TESTER = tester.cpp
 
 OBJ_DIR = obj/
@@ -14,7 +17,7 @@ OBJ = $(SRCS:%.s=$(OBJ_DIR)%.o)
 NAME = libasm.a
 NAME_TEST = tester
 
-CFLAGS = -Wall -Wextra -Werror -g3 -fPIC -fPIE -pie
+CFLAGS = -Wall -Wextra -Werror -g3 -fPIC -fPIE -no-pie
 NASMFLAGS = -f elf64 -DPIC
 
 all: $(NAME)
@@ -32,6 +35,8 @@ test: $(NAME) $(SRCS_TESTER)
 
 clean:
 	rm -rf $(OBJ_DIR)
+	rm -f test_read.txt
+	rm -f test_write.txt
 
 fclean: clean
 	rm -f $(NAME) $(NAME_TEST)

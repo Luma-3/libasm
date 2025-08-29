@@ -5,10 +5,8 @@ ft_strcpy:
   mov rax, rdi
   
   .loop:
-  mov al, [rsi]
-  mov [rdi], al
-  inc rdi
-  inc rsi
+  lodsb
+  stosb
   test al, al
   jnz .loop
   ret

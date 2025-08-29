@@ -19,6 +19,10 @@ extern "C" size_t ft_strlen(const char *s);
 extern "C" char *ft_strcpy(char *dest, const char *src);
 extern "C" int ft_strcmp(const char *s1, const char *s2);
 extern "C" ssize_t ft_write(int fd, const void *buf, size_t count);
+extern "C" ssize_t ft_read(int fd, void *buf, size_t count);
+extern "C" char *ft_strdup(const char *s);
+
+extern "C" int ft_atoi_base(const char *str, const char *base);
 
 class Benchmarker {
 public:
@@ -229,20 +233,20 @@ void test_write() {
     const char *buf;
     size_t count;
   };
+
   std::vector<WriteCase> cases = {
       {"Hello, World!", fd, "Hello, World!\n", 14},
       {"empty", fd, "", 0},
-      {"simple", fd, "A", 1},
-      {"long", fd, "This is a longer string to test the write function.\n", 50},
+      {"simple", fd, "A\n", 2},
+      {"long", fd, "This is a longer string to test the write function.\n", 52},
       {"invalid fd", -1, "Invalid FD\n", 12},
-      {"null", fd, nullptr, 10} // This will likely cause a segmentation fault
-  };
+      {"null", fd, nullptr, 10}};
 
   for (const auto &c : cases) {
     ssize_t ret_std = write(c.fd, c.buf, c.count);
-    int err_std = errno; // Save errno after standard write
+    int err_std = errno;
     ssize_t ret_ft = ft_write(c.fd, c.buf, c.count);
-    int err_ft = errno; // Save errno after ft_write
+    int err_ft = errno;
 
     std::string result = (ret_std == ret_ft && err_std == err_ft)
                              ? (std::string(GREEN) + "OK" + RES)
@@ -252,16 +256,155 @@ void test_write() {
               << std::setw(15) << ret_std << std::setw(15) << ret_ft
               << std::setw(15) << err_std << std::setw(15) << err_ft << "\n";
   }
+
+  if (close(fd) == -1) {
+    std::cerr << "Failed to close test_write.txt after writing.\n";
+  }
+  errno = 0;
+}
+
+void test_read() {
+  print_header("Testing ft_read vs read");
+  printf_table_header(
+      {"Case", "Result", "ret std", "ret ft", "errno std", "errno ft"},
+      {20, 12, 15, 15, 15, 15});
+
+  int fd = open("test_read.txt", O_CREAT | O_RDWR | O_TRUNC, 0644);
+  if (fd == -1) {
+    std::cerr << "Failed to open test_read.txt for reading.\n";
+    return;
+  }
+  const char *content = "This is a test file for read function.\n";
+  write(fd, content, strlen(content));
+  lseek(fd, 0, SEEK_SET); // Reset file offset to the beginning
+
+  struct ReadCase {
+    std::string name;
+    int fd;
+    size_t count;
+  };
+  std::vector<ReadCase> cases = {
+      {"normal read", fd, 10},
+      {"read more than file", fd, 100},
+      {"zero bytes", fd, 0},
+      {"invalid fd", -1, 10},
+  };
+
+  for (const auto &c : cases) {
+    char buf_std[101] = {0};
+    char buf_ft[101] = {0};
+
+    ssize_t ret_std = read(c.fd, buf_std, c.count);
+    int err_std = errno; // Save errno after standard read
+    lseek(fd, 0, SEEK_SET);
+    ssize_t ret_ft = ft_read(c.fd, buf_ft, c.count);
+    int err_ft = errno; // Save errno after ft_read
+    lseek(fd, 0, SEEK_SET);
+
+    std::string result = (ret_std == ret_ft && err_std == err_ft &&
+                          std::memcmp(buf_std, buf_ft, sizeof(buf_std)) == 0)
+                             ? (std::string(GREEN) + "OK" + RES)
+                             : (std::string(RED) + "FAIL" + RES);
+
+    std::cout << std::left << std::setw(20) << c.name << std::setw(21) << result
+              << std::setw(15) << ret_std << std::setw(15) << ret_ft
+              << std::setw(15) << err_std << std::setw(15) << err_ft << "\n";
+  }
+
+  // Special case: read
+  // null buffer
+
+  char *null_buf = nullptr;
+  ssize_t ret_std = read(fd, null_buf, 10);
+  int err_std = errno;
+  lseek(fd, 0, SEEK_SET);
+  ssize_t ret_ft = ft_read(fd, null_buf, 10);
+  int err_ft = errno;
+  lseek(fd, 0, SEEK_SET);
+
+  std::string result = (ret_std == ret_ft && err_std == err_ft)
+                           ? (std::string(GREEN) + "OK" + RES)
+                           : (std::string(RED) + "FAIL" + RES);
+
+  std::cout << std::left << std::setw(20) << "null buffer" << std::setw(21)
+            << result << std::setw(15) << ret_std << std::setw(15) << ret_ft
+            << std::setw(15) << err_std << std::setw(15) << err_ft << "\n";
+
+  if (close(fd) == -1) {
+    std::cerr << "Failed to close test_read.txt after reading.\n";
+  }
+  errno = 0;
+}
+
+void test_strdup(size_t iteration = 1000) {
+  print_header("Testing ft_strdup vs strdup");
+  printf_table_header({"Case", "Result", "std (s)", "ft (s)", "Compare"},
+                      {20, 12, 15, 15, 15});
+
+  struct StrdupCase {
+    std::string name;
+    const char *str;
+  };
+
+  std::vector<StrdupCase> cases = {{"normal", "Hello, World!"},
+                                   {"empty", ""},
+                                   {"long", std::string(1000, 'a').c_str()}};
+
+  (void)iteration; // Currently not used in timing
+
+  for (const auto &c : cases) {
+    double std_time = Benchmarker::run(
+        [&]() {
+          char *dup = strdup(c.str);
+          free(dup);
+        },
+        iteration);
+
+    double ft_time = Benchmarker::run(
+        [&]() {
+          char *dup = ft_strdup(c.str);
+          free(dup);
+        },
+        iteration);
+
+    char *std_dup = strdup(c.str);
+    char *ft_dup = ft_strdup(c.str);
+
+    std::string std_result = std_dup ? std_dup : "nullptr";
+    std::string ft_result = ft_dup ? ft_dup : "nullptr";
+
+    std::string result = (std_result == ft_result)
+                             ? (std::string(GREEN) + "OK" + RES)
+                             : (std::string(RED) + "FAIL" + RES);
+
+    std::string compare;
+    if (ft_time < std_time)
+      compare = std::string(GREEN) + "ft faster" + RES;
+    else
+      compare = std::string(RED) + "ft slower" + RES;
+
+    std::cout << std::left << std::setw(20) << c.name << std::setw(21) << result
+              << std::setw(15) << std::fixed << std::setprecision(6) << std_time
+              << std::setw(15) << ft_time << compare << "\n";
+
+    free(std_dup);
+    free(ft_dup);
+  }
 }
 
 int main() {
   std::vector<int> sizes = {0, 1, 10, 100, 1000, 10000, 100000};
 
-  test_strlen(sizes, 1000);
-  test_strcpy(sizes, 1000);
-  test_strcmp(100000);
+  test_strlen(sizes, 10000);
+  test_strcpy(sizes, 10000);
+  test_strcmp(10000);
 
   test_write();
+  test_read();
+
+  test_strdup(10000);
+
+  std::cout << ft_atoi_base("1", "0123456789") << '\n';
 
   return 0;
 }

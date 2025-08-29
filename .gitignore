@@ -1,0 +1,5 @@
+*.o
+*.a
+obj/
+test_*.txt
+tester
