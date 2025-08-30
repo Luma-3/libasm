@@ -26,13 +26,18 @@ ft_atoi_base:
 	sub rsp, 256*4
 	mov rdi, rsp; rbx points to the start of the array (256 integers)
 
+  ; Initialize the table with -1
 	mov ecx, 256
 	mov eax, -1
 	rep stosd; store eax at [rdi], and increment rdi by 4 (size of dword)
+
+  ; Restore param for use
 	mov rdi, rbx; rdi = string to convert
 	mov rbx, rsp; rbx = start of table
 
 	xor rdx, rdx
+
+  
 
 .fill_loop:
 	movzx rax, byte [rsi + rdx]
@@ -44,6 +49,34 @@ ft_atoi_base:
 
 .fill_done:
 	xor r9, r9
+
+.skipspaces:
+  movzx rax, byte [rdi]
+  cmp al, 32 ; space
+  je .isspace
+  cmp al, 9 ; tab
+  jb .check_sign
+  cmp al, 13 ; carriage Return
+  ja .check_sign
+
+.isspace:
+  inc rdi
+  jmp .skipspaces
+
+.check_sign:
+  mov ecx, 1
+  movzx rax, byte [rdi]
+  cmp al, '-'
+  jne .check_plus
+  neg ecx
+  inc rdi
+  jmp .loop
+  
+.check_plus:
+  cmp al, '+'
+  jne .loop
+  inc rdi
+
 
 .loop:
 	movzx rax, byte [rdi]
@@ -59,6 +92,7 @@ ft_atoi_base:
 
 .done:
 	mov eax, r9d
+  imul eax, ecx
 	add rsp, 256*4
 	pop rbx
 	ret

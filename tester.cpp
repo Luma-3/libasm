@@ -39,7 +39,7 @@ public:
 void print_header(const std::string &title, size_t width = 69) {
   std::cout << std::string(YELLOW) << "\n";
   std::cout << std::string(width, '=') << "\n";
-  std::cout << std::setw((width + title.size()) / 2) << title << "\n";
+  std::cout << title << "\n";
   std::cout << std::string(width, '=') << "\n";
   std::cout << std::string(RES);
 }
@@ -392,6 +392,52 @@ void test_strdup(size_t iteration = 1000) {
   }
 }
 
+void test_atoi_base(size_t iteration = 1000) {
+  print_header("Testing ft_atoi_base vs atoi_base");
+  printf_table_header({"Case", "Result", "as", "expected", "ft (s)"},
+                      {20, 12, 12, 12, 15});
+
+  struct AtoiBaseCase {
+    std::string name;
+    const char *str;
+    const char *base;
+    int expected;
+  };
+
+  std::vector<AtoiBaseCase> cases = {
+      {"binary", "1010", "01", 10},
+      {"octal", "52", "01234567", 42},
+      {"decimal", "42", "0123456789", 42},
+      {"hexadecimal", "2A", "0123456789ABCDEF", 42},
+      {"invalid base", "42", "0", 0},
+      {"invalid str", "G1", "0123456789ABCDEF", 0},
+      {"empty str", "", "0123456789", 0},
+      {"empty base", "42", "", 0},
+      {"whitespace", "   -42", "0123456789", -42},
+      {"plus sign", "+42", "0123456789", 42},
+      {"mixed case", "aBc", "abcdefghijklmnopqrstuvwxyz", 0}};
+
+  for (const auto &c : cases) {
+
+    double ft_time = Benchmarker::run(
+        [&]() {
+          volatile int res = ft_atoi_base(c.str, c.base);
+          (void)res;
+        },
+        iteration);
+
+    int ft_result = ft_atoi_base(c.str, c.base);
+    std::string result = (ft_result == c.expected)
+                             ? (std::string(GREEN) + "OK" + RES)
+                             : (std::string(RED) + "FAIL" + RES);
+
+    std::cout << std::left << std::setw(20) << c.name << std::setw(21) << result
+              << std::setw(12) << c.expected << std::setw(12) << ft_result
+              << std::setw(15) << std::fixed << std::setprecision(6) << ft_time
+              << "\n";
+  }
+}
+
 int main() {
   std::vector<int> sizes = {0, 1, 10, 100, 1000, 10000, 100000};
 
@@ -403,8 +449,7 @@ int main() {
   test_read();
 
   test_strdup(10000);
-
-  std::cout << ft_atoi_base("A2", "0123456789ABCDEF") << '\n';
+  test_atoi_base(10000);
 
   return 0;
 }
