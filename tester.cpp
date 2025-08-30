@@ -24,6 +24,12 @@ extern "C" char *ft_strdup(const char *s);
 
 extern "C" int ft_atoi_base(const char *str, const char *base);
 
+extern "C" void ft_list_push_front(void **begin_list, void *data);
+extern "C" size_t ft_list_size(void *begin_list);
+extern "C" void ft_list_sort(void **begin_list, int (*cmp)());
+extern "C" void ft_list_remove_if(void **begin_list, void *data_ref,
+                                  int (*cmp)(), void (*free_fct)(void *));
+
 class Benchmarker {
 public:
   static double run(const std::function<void()> &func, size_t iterations) {
