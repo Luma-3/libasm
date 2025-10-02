@@ -29,9 +29,26 @@ $(OBJ_DIR)%.o : $(SRCS_DIR)%.s
 	mkdir -p $(OBJ_DIR)
 	$(NASM) $(NASMFLAGS) -o $@ $<
 
-test: $(NAME) $(SRCS_TESTER)
-	$(GCC) $(CFLAGS) -o $(NAME_TEST) $(SRCS_TESTER) -L. -lasm
-	./$(NAME_TEST)
+init: test/build/Makefile
+		bear -- make -B -C.
+		jq -s 'add' compile_commands.json test/build/compile_commands.json > compile_commands_tmp.json
+		mv compile_commands_tmp.json compile_commands.json
+
+###############################
+###########  TEST  ############
+###############################
+
+CMAKE_SRCS := $(wildcard test/*.cpp test/*.hpp)
+
+test:	test/build/Makefile
+	make -C test/build
+
+test/build/Makefile : $(CMAKE_SRCS) $(NAME)
+	mkdir -p test/build
+	cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -S test -B test/build
+
+run-test: test
+	cd test/build && ./asm_test
 
 clean:
 	rm -rf $(OBJ_DIR)
