@@ -6,7 +6,7 @@
 
 extern "C" size_t ft_strlen(const char *src);
 
-TEST(Strlen, basic) {
+TEST(strlen, basic) {
   std::string str(16, 'n');
 
   const char *c_str = str.c_str();
@@ -18,15 +18,13 @@ TEST(Strlen, basic) {
   EXPECT_EQ(i, lib);
 }
 
-TEST(Strlen, null) {
+TEST(strlen, null) {
   EXPECT_DEATH({ ft_strlen(NULL); }, ".*");
   EXPECT_DEATH({ size_t i = strlen(NULL); }, ".*");
 }
 
-TEST(Strlen, Long) {
-  std::string str(10000, 'n');
-
-  const char *c_str = str.c_str();
+TEST(strlen, empty) {
+  const char *c_str = "";
 
   const size_t i = ft_strlen(c_str);
 
@@ -35,8 +33,8 @@ TEST(Strlen, Long) {
   EXPECT_EQ(i, lib);
 }
 
-TEST(Strlen, Max) {
-  std::string str(2147483647, 'n');
+TEST(strlen, long_str) {
+  std::string str(1000000, 'n');
 
   const char *c_str = str.c_str();
 

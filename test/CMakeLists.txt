@@ -16,6 +16,11 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(asm_test
 	ft_strlen.cpp
+	ft_strcmp.cpp
+	ft_strcpy.cpp
+	ft_strdup.cpp
+	ft_write.cpp
+	ft_read.cpp
 )
 
 target_link_libraries(asm_test PRIVATE
