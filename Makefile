@@ -47,11 +47,10 @@ run-test: test
 
 clean:
 	rm -rf $(OBJ_DIR)
-	rm -f test_read.txt
-	rm -f test_write.txt
 
 fclean: clean
 	rm -f $(NAME) $(NAME_TEST)
+	rm -rf test/build
 
 re: fclean all
 
