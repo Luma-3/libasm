@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <iostream>
 #include <string>
 #include <sys/types.h>
 
@@ -56,16 +57,36 @@ TEST(read, long_str) {
 
 TEST(read, invalid_fd) {
   char buffer[50] = {0};
+
   ssize_t ft_bytes = ft_read(-1, buffer, 10);
+  int ft_errno = errno;
+  errno = 0;
+
   ssize_t lib_bytes = read(-1, buffer, 10);
+  int lib_errno = errno;
+  errno = 0;
+  std::cout << "ft_errno: " << ft_errno << ", lib_errno: " << lib_errno
+            << std::endl;
   EXPECT_EQ(ft_bytes, lib_bytes);
+  EXPECT_EQ(ft_errno, lib_errno);
 }
 
 TEST(read, null_buffer) {
   FILE *temp = tmpfile();
   int fd = fileno(temp);
+
   ssize_t ft_bytes = ft_read(fd, NULL, 10);
+  int ft_errno = errno;
+  errno = 0;
+
   ssize_t lib_bytes = read(fd, NULL, 10);
+  int lib_errno = errno;
+  errno = 0;
+
+  std::cout << "ft_errno: " << ft_errno << ", lib_errno: " << lib_errno
+            << std::endl;
+  EXPECT_EQ(ft_errno, lib_errno);
+
   EXPECT_EQ(ft_bytes, lib_bytes);
   fclose(temp);
 }
@@ -83,7 +104,8 @@ TEST(read, zero_count) {
 
   ssize_t ft_bytes = ft_read(fd, buffer_ft, 0);
   ssize_t lib_bytes = read(fd, buffer_lib, 0);
-  EXPECT_EQ(ft_bytes, 0);
+
+  EXPECT_EQ(ft_bytes, lib_bytes);
   EXPECT_EQ(std::string(buffer_ft), std::string(buffer_lib));
 
   fclose(temp);

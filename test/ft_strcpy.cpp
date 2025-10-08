@@ -33,8 +33,8 @@ TEST(strcpy, empty) {
 
 TEST(strcpy, long_str) {
   std::string src(1000000, 'a');
-  char *dest_ft = new char[1000001];
-  char *dest_lib = new char[1000001];
+  char dest_ft[1000001];
+  char dest_lib[1000001];
 
   char *ft = ft_strcpy(dest_ft, src.c_str());
   char *lib = strcpy(dest_lib, src.c_str());
@@ -42,9 +42,6 @@ TEST(strcpy, long_str) {
   EXPECT_EQ(std::string(dest_ft), std::string(dest_lib));
   EXPECT_EQ(ft, dest_ft);
   EXPECT_EQ(lib, dest_lib);
-
-  delete[] dest_ft;
-  delete[] dest_lib;
 }
 
 TEST(strcpy, null) {

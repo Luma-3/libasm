@@ -12,6 +12,9 @@ TEST(strdup, basic) {
   char *lib = strdup(c_str);
 
   EXPECT_EQ(std::string(ft), std::string(lib));
+
+  free(ft);
+  free(lib);
 }
 
 TEST(strdup, empty) {
@@ -21,6 +24,9 @@ TEST(strdup, empty) {
   char *lib = strdup(c_str);
 
   EXPECT_EQ(std::string(ft), std::string(lib));
+
+  free(ft);
+  free(lib);
 }
 
 TEST(strdup, long_str) {
@@ -31,6 +37,9 @@ TEST(strdup, long_str) {
   char *lib = strdup(c_str);
 
   EXPECT_EQ(std::string(ft), std::string(lib));
+
+  free(ft);
+  free(lib);
 }
 
 TEST(strdup, null) {
